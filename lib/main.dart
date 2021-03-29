@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_social_media/pages/wrapper.dart';
+import 'package:flutter_social_media/route_generator.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Chat',
       home: _Content(),
+      onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
 }
