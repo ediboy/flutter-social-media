@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_social_media/helpers/post_helper.dart';
+import 'package:flutter_social_media/helpers/create_post_helper.dart';
 import 'package:flutter_social_media/models/user_model.dart';
 import 'package:flutter_social_media/services/post_service.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +19,8 @@ class _CreatePostState extends State<CreatePost> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<PostHelper>(create: (_) => PostHelper()),
+        ChangeNotifierProvider<CreatePostHelper>(
+            create: (_) => CreatePostHelper()),
         Provider<UserModel>(create: (_) => widget.user),
       ],
       child: _PostForm(),
@@ -35,10 +36,10 @@ class _PostForm extends StatefulWidget {
 class __PostFormState extends State<_PostForm> {
   @override
   Widget build(BuildContext context) {
-    PostHelper _postHelper = context.watch<PostHelper>();
+    CreatePostHelper _createPostHelper = context.watch<CreatePostHelper>();
     UserModel _user = context.watch<UserModel>();
 
-    _postHelper.context = context;
+    _createPostHelper.context = context;
 
     return Scaffold(
       appBar: AppBar(
@@ -47,17 +48,17 @@ class __PostFormState extends State<_PostForm> {
           TextButton(
             onPressed: () async {
               // check if text or image is not empty
-              if (_postHelper.postController.text.isNotEmpty ||
-                  _postHelper.attachments.isNotEmpty) {
+              if (_createPostHelper.postController.text.isNotEmpty ||
+                  _createPostHelper.attachments.isNotEmpty) {
                 dynamic result = await PostService().createPost(
-                    _postHelper.postController.text,
-                    _postHelper.attachments,
+                    _createPostHelper.postController.text,
+                    _createPostHelper.attachments,
                     _user);
 
                 if (result != null) {
                   setState(() {
-                    _postHelper.postController.text = '';
-                    _postHelper.attachments = [];
+                    _createPostHelper.postController.text = '';
+                    _createPostHelper.attachments = [];
                   });
 
                   Navigator.pop(context);
@@ -88,7 +89,7 @@ class __PostFormState extends State<_PostForm> {
                 contentPadding: EdgeInsets.all(10),
               ),
               maxLines: 6,
-              controller: _postHelper.postController ?? null,
+              controller: _createPostHelper.postController ?? null,
             ),
             SizedBox(height: 10),
             GridView.builder(
@@ -99,7 +100,7 @@ class __PostFormState extends State<_PostForm> {
                 crossAxisSpacing: 5,
                 mainAxisSpacing: 5,
               ),
-              itemCount: _postHelper.attachments.length,
+              itemCount: _createPostHelper.attachments.length,
               itemBuilder: (context, index) {
                 return Container(
                   color: Theme.of(context).primaryColor.withOpacity(0.2),
@@ -107,7 +108,7 @@ class __PostFormState extends State<_PostForm> {
                     children: [
                       Center(
                         child: Image.memory(
-                          _postHelper.attachments[index].bytes,
+                          _createPostHelper.attachments[index].bytes,
                         ),
                       ),
                       Positioned(
@@ -117,7 +118,7 @@ class __PostFormState extends State<_PostForm> {
                           icon: Icon(Icons.cancel),
                           onPressed: () {
                             setState(() {
-                              _postHelper.attachments.removeAt(index);
+                              _createPostHelper.attachments.removeAt(index);
                             });
                           },
                           color: Colors.red,
@@ -138,7 +139,7 @@ class __PostFormState extends State<_PostForm> {
 class _BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    PostHelper _postHelper = context.watch<PostHelper>();
+    CreatePostHelper _createPostHelper = context.watch<CreatePostHelper>();
 
     return Container(
       color: Theme.of(context).primaryColor.withOpacity(.1),
@@ -157,7 +158,7 @@ class _BottomNav extends StatelessWidget {
                 allowedExtensions: ['jpg', 'jpeg', 'png'],
               );
               if (result != null) {
-                _postHelper.setAttachment(result);
+                _createPostHelper.setAttachment(result);
               }
             },
           ),

@@ -19,7 +19,7 @@ class PostService {
 
       // if post is not empty
       _batch.set(_postDocument, {
-        'post': post,
+        'content': post,
         'created_at': FieldValue.serverTimestamp(),
       });
 
@@ -67,6 +67,29 @@ class PostService {
       }
 
       return _urls;
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  // get posts
+  Future<QuerySnapshot> getPosts(
+      int limit, DocumentSnapshot lastDocument) async {
+    try {
+      Query query =
+          postCollection.limit(limit).orderBy('created_at', descending: true);
+
+      QuerySnapshot posts;
+
+      // if last document was set, start from there
+      if (lastDocument != null) {
+        posts = await query.startAfterDocument(lastDocument).get();
+      } else {
+        posts = await query.get();
+      }
+
+      return posts;
     } catch (e) {
       print(e.toString());
       return null;
