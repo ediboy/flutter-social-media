@@ -168,4 +168,13 @@ class PostService {
       return null;
     }
   }
+
+  Future deletePost(String postId) async {
+    try {
+      return await postCollection.doc(postId).delete().then((value) => true);
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
 }

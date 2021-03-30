@@ -4,6 +4,7 @@ import 'package:flutter_social_media/helpers/post_helper.dart';
 import 'package:flutter_social_media/models/post_model.dart';
 import 'package:flutter_social_media/models/user_model.dart';
 import 'package:flutter_social_media/pages/shared/image_slider.dart';
+import 'package:flutter_social_media/services/post_service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -65,6 +66,7 @@ class __PostListState extends State<_PostList> {
   Widget build(BuildContext context) {
     List<PostModel> _posts = context.watch<List<PostModel>>();
     final _user = context.watch<UserModel>();
+    _postHelper.context = context;
 
     if (_posts == null) {
       return Center(child: CircularProgressIndicator());
@@ -167,6 +169,17 @@ class __PostItemState extends State<_PostItem> {
                       arguments: widget.post);
 
                   _postHelper.updatePostContent(_post);
+                  _postHelper.showMessage('Post updated');
+                }
+
+                if (value == 'delete') {
+                  dynamic _result =
+                      await PostService().deletePost(widget.post.id);
+
+                  if (_result != null) {
+                    _postHelper.removePostContent(widget.post.id);
+                    _postHelper.showMessage('Post deleted');
+                  }
                 }
               },
             ),

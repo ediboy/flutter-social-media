@@ -15,6 +15,7 @@ class PostHelper {
   DocumentSnapshot _lastDocument;
   StreamController<List<DocumentSnapshot>> _controller;
   ScrollController scrollController;
+  BuildContext context;
 
   // load initial records
   void loadPosts() {
@@ -101,5 +102,21 @@ class PostHelper {
     _data[index] = postDocument;
 
     _controller.add(_data);
+  }
+
+  // remove post from stream
+  void removePostContent(String postId) {
+    _data.removeWhere((e) => e.id == postId);
+
+    _controller.add(_data);
+  }
+
+  // show snackbar message
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 }
