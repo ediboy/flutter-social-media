@@ -230,13 +230,22 @@ class _SingleAttachment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black,
-      constraints: BoxConstraints(maxHeight: 650),
-      width: double.infinity,
-      child: Image.network(
-        attachments[0],
-        fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () => showDialog(
+        context: context,
+        builder: (_) => ImageSlider(
+          images: attachments,
+          selectedIndex: 1,
+        ),
+      ),
+      child: Container(
+        color: Colors.black,
+        constraints: BoxConstraints(maxHeight: 650),
+        width: double.infinity,
+        child: Image.network(
+          attachments[0],
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }
@@ -257,10 +266,19 @@ class _DoubleAttachment extends StatelessWidget {
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         itemCount: attachments.length,
-        itemBuilder: (context, index) => Container(
-          child: Image.network(
-            attachments[index],
-            fit: BoxFit.cover,
+        itemBuilder: (context, index) => GestureDetector(
+          onTap: () => showDialog(
+            context: context,
+            builder: (_) => ImageSlider(
+              images: attachments,
+              selectedIndex: index,
+            ),
+          ),
+          child: Container(
+            child: Image.network(
+              attachments[index],
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
@@ -319,10 +337,19 @@ class _QuadAttachment extends StatelessWidget {
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         itemCount: attachments.length,
-        itemBuilder: (context, index) => Container(
-          child: Image.network(
-            attachments[index],
-            fit: BoxFit.cover,
+        itemBuilder: (context, index) => GestureDetector(
+          onTap: () => showDialog(
+            context: context,
+            builder: (_) => ImageSlider(
+              images: attachments,
+              selectedIndex: index,
+            ),
+          ),
+          child: Container(
+            child: Image.network(
+              attachments[index],
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
@@ -356,15 +383,24 @@ class _MoreAttachment extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  Container(
-                    color: Colors.black.withOpacity(.3),
-                    child: Center(
-                      child: Text(
-                        '+${attachments.length - 4}',
-                        style: Theme.of(context).textTheme.headline2.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                  GestureDetector(
+                    onTap: () => showDialog(
+                      context: context,
+                      builder: (_) => ImageSlider(
+                        images: attachments,
+                        selectedIndex: index,
+                      ),
+                    ),
+                    child: Container(
+                      color: Colors.black.withOpacity(.3),
+                      child: Center(
+                        child: Text(
+                          '+${attachments.length - 4}',
+                          style: Theme.of(context).textTheme.headline2.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
                       ),
                     ),
                   ),
@@ -372,10 +408,19 @@ class _MoreAttachment extends StatelessWidget {
               );
             }
 
-            return Container(
-              child: Image.network(
-                attachments[index],
-                fit: BoxFit.cover,
+            return GestureDetector(
+              onTap: () => showDialog(
+                context: context,
+                builder: (_) => ImageSlider(
+                  images: attachments,
+                  selectedIndex: index,
+                ),
+              ),
+              child: Container(
+                child: Image.network(
+                  attachments[index],
+                  fit: BoxFit.cover,
+                ),
               ),
             );
           }),
