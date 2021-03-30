@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_social_media/helpers/post_helper.dart';
 import 'package:flutter_social_media/models/post_model.dart';
 import 'package:flutter_social_media/models/user_model.dart';
+import 'package:flutter_social_media/pages/shared/image_slider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class Posts extends StatefulWidget {
   @override
@@ -76,7 +78,8 @@ class __PostListState extends State<_PostList> {
           IconButton(
             icon: Icon(Icons.add_box),
             onPressed: () =>
-                Navigator.pushNamed(context, '/create-post', arguments: _user),
+                Navigator.pushNamed(context, '/create-post', arguments: _user)
+                    .then((value) => _postHelper.refresh()),
           )
         ],
       ),
@@ -279,10 +282,19 @@ class _TripleAttachment extends StatelessWidget {
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         itemCount: attachments.length,
-        itemBuilder: (context, index) => Container(
-          child: Image.network(
-            attachments[index],
-            fit: BoxFit.cover,
+        itemBuilder: (context, index) => GestureDetector(
+          onTap: () => showDialog(
+            context: context,
+            builder: (_) => ImageSlider(
+              images: attachments,
+              selectedIndex: index,
+            ),
+          ),
+          child: Container(
+            child: Image.network(
+              attachments[index],
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         staggeredTileBuilder: (int index) =>

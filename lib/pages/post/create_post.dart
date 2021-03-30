@@ -50,10 +50,23 @@ class __PostFormState extends State<_PostForm> {
               // check if text or image is not empty
               if (_createPostHelper.postController.text.isNotEmpty ||
                   _createPostHelper.attachments.isNotEmpty) {
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    content: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    backgroundColor: Colors.white.withOpacity(0),
+                  ),
+                  barrierDismissible: false,
+                );
+
                 dynamic result = await PostService().createPost(
                     _createPostHelper.postController.text,
                     _createPostHelper.attachments,
                     _user);
+
+                Navigator.pop(context);
 
                 if (result != null) {
                   setState(() {
