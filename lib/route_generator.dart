@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_social_media/pages/post/create_post.dart';
+import 'package:flutter_social_media/pages/post/edit_post.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -10,6 +11,12 @@ class RouteGenerator {
       case '/create-post':
         if (args != null) {
           return MaterialPageRoute(builder: (_) => CreatePost(user: args));
+        }
+        return _errorRoute();
+
+      case '/edit-post':
+        if (args != null) {
+          return MaterialPageRoute(builder: (_) => EditPost(post: args));
         }
         return _errorRoute();
 

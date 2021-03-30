@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_social_media/helpers/post_helper.dart';
 import 'package:flutter_social_media/models/user_model.dart';
-import 'package:intl/intl.dart';
-import 'package:timeago/timeago.dart';
 
 class PostModel {
   final String id;

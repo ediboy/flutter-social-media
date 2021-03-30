@@ -69,6 +69,7 @@ class PostHelper {
     });
   }
 
+  // convert date to timeago
   String converDate(DateTime createdAt) {
     final _now = DateTime.now();
     _now.difference(createdAt).inDays;
@@ -90,5 +91,15 @@ class PostHelper {
 
     return format(_now
         .subtract(new Duration(seconds: _now.difference(createdAt).inSeconds)));
+  }
+
+  // update post content stream
+  void updatePostContent(DocumentSnapshot postDocument) {
+    DocumentSnapshot _current =
+        _data.firstWhere((e) => e.id == postDocument.id);
+    int index = _data.indexOf(_current);
+    _data[index] = postDocument;
+
+    _controller.add(_data);
   }
 }

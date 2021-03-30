@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_social_media/models/post_model.dart';
 import 'package:flutter_social_media/models/user_model.dart';
 
 class PostService {
@@ -12,14 +13,14 @@ class PostService {
 
   // create post
   Future createPost(
-      String post, List<PlatformFile> attachments, UserModel user) async {
+      String content, List<PlatformFile> attachments, UserModel user) async {
     try {
       WriteBatch _batch = FirebaseFirestore.instance.batch();
       DocumentReference _postDocument = postCollection.doc();
 
-      // if post is not empty
+      // set post content
       _batch.set(_postDocument, {
-        'content': post,
+        'content': content,
         'created_at': FieldValue.serverTimestamp(),
       });
 
@@ -47,6 +48,56 @@ class PostService {
     }
   }
 
+  // edit post
+  Future editPost(
+      PostModel post,
+      String content,
+      List<PlatformFile> attachments,
+      List currentAttachments,
+      List removedAttachments) async {
+    try {
+      WriteBatch _batch = FirebaseFirestore.instance.batch();
+      DocumentReference _postDocument = postCollection.doc(post.id);
+
+      // update post content
+      _batch.update(_postDocument, {
+        'content': content,
+      });
+
+      // if attachment has been removed
+      if (removedAttachments.isNotEmpty) {
+        removeAttachments(removedAttachments);
+      }
+
+      // handle attachments
+      if (attachments.isNotEmpty) {
+        dynamic _result = await uploadAttachments(attachments, _postDocument);
+
+        if (_result == null) {
+          throw 'Error uploading attachments';
+        }
+
+        List _attachments = currentAttachments;
+
+        _attachments.addAll(_result);
+
+        _batch.update(postCollection.doc(_postDocument.id),
+            {'attachments': _attachments});
+      } else {
+        _batch.update(postCollection.doc(_postDocument.id),
+            {'attachments': currentAttachments});
+      }
+
+      await _batch.commit().then((value) => true);
+
+      return await getPost(_postDocument.id);
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  // upload post atttachments
   Future uploadAttachments(
       List<PlatformFile> attachments, DocumentReference postDocument) async {
     try {
@@ -67,6 +118,28 @@ class PostService {
       }
 
       return _urls;
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  // remove post atttachments
+  Future removeAttachments(List attachments) async {
+    try {
+      for (var attachment in attachments) {
+        // delete attachment from storage
+        _storage.refFromURL(attachment).delete();
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // get post
+  Future<DocumentSnapshot> getPost(String postId) async {
+    try {
+      return await postCollection.doc(postId).get();
     } catch (e) {
       print(e.toString());
       return null;

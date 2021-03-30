@@ -6,7 +6,6 @@ import 'package:flutter_social_media/models/user_model.dart';
 import 'package:flutter_social_media/pages/shared/image_slider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 
 class Posts extends StatefulWidget {
   @override
@@ -127,6 +126,14 @@ class _PostItem extends StatefulWidget {
 
 class __PostItemState extends State<_PostItem> {
   int _maxLine = 2;
+  PostHelper _postHelper;
+
+  @override
+  void initState() {
+    _postHelper = context.read<PostHelper>();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,6 +149,27 @@ class __PostItemState extends State<_PostItem> {
             ),
             title: Text(widget.post.author.name),
             subtitle: Text(widget.post.date.toString()),
+            trailing: PopupMenuButton(
+              icon: Icon(Icons.more_vert),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  child: Text('edit'),
+                  value: 'edit',
+                ),
+                PopupMenuItem(
+                  child: Text('delete'),
+                  value: 'delete',
+                ),
+              ],
+              onSelected: (value) async {
+                if (value == 'edit') {
+                  final _post = await Navigator.pushNamed(context, '/edit-post',
+                      arguments: widget.post);
+
+                  _postHelper.updatePostContent(_post);
+                }
+              },
+            ),
           ),
 
           // attachments
@@ -378,6 +406,7 @@ class _MoreAttachment extends StatelessWidget {
                 children: [
                   Container(
                     width: double.infinity,
+                    height: double.infinity,
                     child: Image.network(
                       attachments[index],
                       fit: BoxFit.cover,
