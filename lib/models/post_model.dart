@@ -8,8 +8,20 @@ class PostModel {
   final UserModel author;
   final List attachments;
   final String date;
+  int likeCount;
+  int commentCount;
+  List likedUsers;
 
-  PostModel({this.id, this.content, this.author, this.attachments, this.date});
+  PostModel({
+    this.id,
+    this.content,
+    this.author,
+    this.attachments,
+    this.date,
+    this.likeCount,
+    this.commentCount,
+    this.likedUsers,
+  });
 
   factory PostModel.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data();
@@ -20,6 +32,9 @@ class PostModel {
       author: UserModel.fromMap(data['user']),
       attachments: data['attachments'] ?? [],
       date: PostHelper().converDate(data['created_at'].toDate()),
+      likeCount: data['like_count'] ?? 0,
+      commentCount: data['comment_count'] ?? 0,
+      likedUsers: data['liked_users'] ?? [],
     );
   }
 }

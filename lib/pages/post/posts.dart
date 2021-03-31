@@ -4,6 +4,8 @@ import 'package:flutter_social_media/helpers/post_helper.dart';
 import 'package:flutter_social_media/models/post_model.dart';
 import 'package:flutter_social_media/models/user_model.dart';
 import 'package:flutter_social_media/pages/shared/image_slider.dart';
+import 'package:flutter_social_media/services/auth_service.dart';
+import 'package:flutter_social_media/services/like_service.dart';
 import 'package:flutter_social_media/services/post_service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -75,6 +77,9 @@ class __PostListState extends State<_PostList> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Posts'),
+        leading: IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () async => AuthService().signOut()),
         actions: [
           IconButton(
             icon: Icon(Icons.add_box),
@@ -129,16 +134,20 @@ class _PostItem extends StatefulWidget {
 class __PostItemState extends State<_PostItem> {
   int _maxLine = 2;
   PostHelper _postHelper;
+  UserModel _user;
 
   @override
   void initState() {
     _postHelper = context.read<PostHelper>();
+    _user = context.read<UserModel>();
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool _isPostLiked = _postHelper.checkUserLiked(widget.post, _user.id);
+
     return Container(
       color: Theme.of(context).primaryColor.withOpacity(.1),
       child: Column(
@@ -151,48 +160,47 @@ class __PostItemState extends State<_PostItem> {
             ),
             title: Text(widget.post.author.name),
             subtitle: Text(widget.post.date.toString()),
-            trailing: PopupMenuButton(
-              icon: Icon(Icons.more_vert),
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  child: Text('edit'),
-                  value: 'edit',
-                ),
-                PopupMenuItem(
-                  child: Text('delete'),
-                  value: 'delete',
-                ),
-              ],
-              onSelected: (value) async {
-                if (value == 'edit') {
-                  final _post = await Navigator.pushNamed(context, '/edit-post',
-                      arguments: widget.post);
+            trailing: (_user.id == widget.post.author.id)
+                ? PopupMenuButton(
+                    icon: Icon(Icons.more_vert),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        child: Text('edit'),
+                        value: 'edit',
+                      ),
+                      PopupMenuItem(
+                        child: Text('delete'),
+                        value: 'delete',
+                      ),
+                    ],
+                    onSelected: (value) async {
+                      if (value == 'edit') {
+                        final _post = await Navigator.pushNamed(
+                            context, '/edit-post',
+                            arguments: widget.post);
 
-                  _postHelper.updatePostContent(_post);
-                  _postHelper.showMessage('Post updated');
-                }
+                        _postHelper.updatePostContent(_post);
+                        _postHelper.showMessage('Post updated');
+                      }
 
-                if (value == 'delete') {
-                  dynamic _result =
-                      await PostService().deletePost(widget.post.id);
+                      if (value == 'delete') {
+                        dynamic _result =
+                            await PostService().deletePost(widget.post.id);
 
-                  if (_result != null) {
-                    _postHelper.removePostContent(widget.post.id);
-                    _postHelper.showMessage('Post deleted');
-                  }
-                }
-              },
-            ),
+                        if (_result != null) {
+                          _postHelper.removePostContent(widget.post.id);
+                          _postHelper.showMessage('Post deleted');
+                        }
+                      }
+                    },
+                  )
+                : null,
           ),
 
           // attachments
           if (widget.post.attachments.isNotEmpty) ...[
             _Attachments(attachments: widget.post.attachments),
           ],
-
-          // likes
-
-          // comments
 
           // post
           if (widget.post.content.isNotEmpty) ...[
@@ -228,7 +236,74 @@ class __PostItemState extends State<_PostItem> {
                 ),
               ),
             ),
-          ]
+          ],
+
+          // likes & comment
+          Row(
+            children: [
+              Row(
+                children: [
+                  if (_isPostLiked) ...[
+                    IconButton(
+                      icon: Icon(
+                        Icons.favorite,
+                        color: Colors.red,
+                      ),
+                      onPressed: () {
+                        LikeService(postId: widget.post.id, userId: _user.id)
+                            .unlike();
+
+                        setState(() {
+                          widget.post.likeCount -= 1;
+                          widget.post.likedUsers.remove(_user.id);
+                        });
+                      },
+                    )
+                  ] else ...[
+                    IconButton(
+                      icon: Icon(
+                        Icons.favorite,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        LikeService(postId: widget.post.id, userId: _user.id)
+                            .like();
+
+                        setState(() {
+                          widget.post.likeCount += 1;
+                          widget.post.likedUsers.add(_user.id);
+                        });
+                      },
+                    )
+                  ],
+                  if (widget.post.likeCount != 0) ...[
+                    InkWell(
+                      onTap: () {},
+                      child: Text(widget.post.likeCount.toString()),
+                    ),
+                  ],
+                ],
+              ),
+              SizedBox(width: 10),
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.chat_bubble_outline,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {},
+                  ),
+                  if (widget.post.commentCount != 0) ...[
+                    InkWell(
+                      onTap: () {},
+                      child: Text(widget.post.commentCount.toString()),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
         ],
       ),
     );

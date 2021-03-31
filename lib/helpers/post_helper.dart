@@ -119,4 +119,9 @@ class PostHelper {
       ),
     );
   }
+
+  // check if user liked the post
+  bool checkUserLiked(PostModel post, String userId) {
+    return post.likedUsers.contains(userId);
+  }
 }

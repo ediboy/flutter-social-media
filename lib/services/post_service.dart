@@ -6,7 +6,7 @@ import 'package:flutter_social_media/models/user_model.dart';
 
 class PostService {
   // collection reference
-  final CollectionReference postCollection =
+  final CollectionReference _postCollection =
       FirebaseFirestore.instance.collection('posts');
 
   final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -16,7 +16,7 @@ class PostService {
       String content, List<PlatformFile> attachments, UserModel user) async {
     try {
       WriteBatch _batch = FirebaseFirestore.instance.batch();
-      DocumentReference _postDocument = postCollection.doc();
+      DocumentReference _postDocument = _postCollection.doc();
 
       // set post content
       _batch.set(_postDocument, {
@@ -33,7 +33,7 @@ class PostService {
         }
 
         _batch.update(
-            postCollection.doc(_postDocument.id), {'attachments': _result});
+            _postCollection.doc(_postDocument.id), {'attachments': _result});
       }
 
       _batch.update(_postDocument, {
@@ -57,7 +57,7 @@ class PostService {
       List removedAttachments) async {
     try {
       WriteBatch _batch = FirebaseFirestore.instance.batch();
-      DocumentReference _postDocument = postCollection.doc(post.id);
+      DocumentReference _postDocument = _postCollection.doc(post.id);
 
       // update post content
       _batch.update(_postDocument, {
@@ -81,10 +81,10 @@ class PostService {
 
         _attachments.addAll(_result);
 
-        _batch.update(postCollection.doc(_postDocument.id),
+        _batch.update(_postCollection.doc(_postDocument.id),
             {'attachments': _attachments});
       } else {
-        _batch.update(postCollection.doc(_postDocument.id),
+        _batch.update(_postCollection.doc(_postDocument.id),
             {'attachments': currentAttachments});
       }
 
@@ -139,7 +139,7 @@ class PostService {
   // get post
   Future<DocumentSnapshot> getPost(String postId) async {
     try {
-      return await postCollection.doc(postId).get();
+      return await _postCollection.doc(postId).get();
     } catch (e) {
       print(e.toString());
       return null;
@@ -151,16 +151,16 @@ class PostService {
       int limit, DocumentSnapshot lastDocument) async {
     try {
       Query query =
-          postCollection.limit(limit).orderBy('created_at', descending: true);
+          _postCollection.limit(limit).orderBy('created_at', descending: true);
 
       QuerySnapshot posts;
 
       // if last document was set, start from there
       if (lastDocument != null) {
-        posts = await query.startAfterDocument(lastDocument).get();
-      } else {
-        posts = await query.get();
+        query = query.startAfterDocument(lastDocument);
       }
+
+      posts = await query.get();
 
       return posts;
     } catch (e) {
@@ -169,9 +169,10 @@ class PostService {
     }
   }
 
+  // delete post
   Future deletePost(String postId) async {
     try {
-      return await postCollection.doc(postId).delete().then((value) => true);
+      return await _postCollection.doc(postId).delete().then((value) => true);
     } catch (e) {
       print(e.toString());
       return null;

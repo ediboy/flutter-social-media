@@ -8,12 +8,12 @@ class UserService {
   UserService({this.id, this.email});
 
   // collection reference
-  final CollectionReference userCollection =
+  final CollectionReference _userCollection =
       FirebaseFirestore.instance.collection('users');
 
   // stream user
   Stream<UserModel> get user {
-    return userCollection
+    return _userCollection
         .doc(id)
         .snapshots()
         .map((snap) => UserModel.fromFirestore(snap));
