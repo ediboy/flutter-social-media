@@ -59,15 +59,16 @@ class __PostContentState extends State<_PostContent> {
     }
 
     CommentService _commentService = CommentService(postId: _post.id);
+    ScrollController _scrollController = new ScrollController();
 
     return Scaffold(
       appBar: AppBar(),
       body: Container(
-        // color: Theme.of(context).primaryColor.withOpacity(.1),
         child: Column(
           children: [
             Expanded(
               child: ListView(
+                controller: _scrollController,
                 children: [
                   PostItem(
                     post: _post,
@@ -77,7 +78,9 @@ class __PostContentState extends State<_PostContent> {
                   StreamProvider<List<CommentModel>>.value(
                     value: _commentService.comments,
                     initialData: [],
-                    child: _Comments(),
+                    child: _Comments(
+                      scrollController: _scrollController,
+                    ),
                   ),
                 ],
               ),
@@ -135,9 +138,22 @@ class __PostContentState extends State<_PostContent> {
 }
 
 class _Comments extends StatelessWidget {
+  final ScrollController scrollController;
+
+  _Comments({this.scrollController});
+
   @override
   Widget build(BuildContext context) {
     List<CommentModel> _comments = context.watch<List<CommentModel>>();
+
+    // scroll to the bottom
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        curve: Curves.easeOut,
+        duration: const Duration(milliseconds: 300),
+      );
+    });
 
     if (_comments == null) {
       return Center(

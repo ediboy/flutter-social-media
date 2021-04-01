@@ -22,7 +22,9 @@ class CommentModel {
       id: doc.id,
       content: data['content'] ?? '',
       author: UserModel.fromMap(data['user']),
-      date: PostHelper().converDate(data['created_at'].toDate()),
+      date: (data['created_at'] != null)
+          ? PostHelper().converDate(data['created_at'].toDate())
+          : '',
     );
   }
 }
