@@ -472,7 +472,8 @@ class __LikeState extends State<_Like> {
         ],
         if (widget.post.likeCount != 0) ...[
           InkWell(
-            onTap: () {},
+            onTap: () => Navigator.pushNamed(context, '/likes',
+                arguments: widget.post.likedUsers),
             child: Text(widget.post.likeCount.toString()),
           ),
         ],
@@ -512,10 +513,7 @@ class __CommentState extends State<_Comment> {
         },
       ),
       if (widget.post.commentCount != 0) ...[
-        InkWell(
-          onTap: () {},
-          child: Text(widget.post.commentCount.toString()),
-        ),
+        Text(widget.post.commentCount.toString()),
       ],
     ]);
   }

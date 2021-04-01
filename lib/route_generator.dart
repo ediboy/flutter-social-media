@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_social_media/arguments/post_arguments.dart';
+import 'package:flutter_social_media/pages/like/like.dart';
 import 'package:flutter_social_media/pages/post/create_post.dart';
 import 'package:flutter_social_media/pages/post/edit_post.dart';
 import 'package:flutter_social_media/pages/post/post.dart';
@@ -30,6 +31,12 @@ class RouteGenerator {
                     postId: _postArgs.postId,
                     user: _postArgs.user,
                   ));
+        }
+        return _errorRoute();
+
+      case '/likes':
+        if (args != null) {
+          return MaterialPageRoute(builder: (_) => Likes(users: args));
         }
         return _errorRoute();
 

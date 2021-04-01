@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_social_media/models/user_model.dart';
 
 class LikeService {
   final String postId;
@@ -12,6 +13,9 @@ class LikeService {
   // collection reference
   final CollectionReference _postCollection =
       FirebaseFirestore.instance.collection('posts');
+
+  final CollectionReference _userCollection =
+      FirebaseFirestore.instance.collection('users');
 
   // post document reference
   DocumentReference _postDocument;
@@ -39,6 +43,17 @@ class LikeService {
     } catch (e) {
       print(e.toString());
       return false;
+    }
+  }
+
+  Future<List<UserModel>> getLikedUsers(List users) async {
+    try {
+      return await _userCollection.where('id', whereIn: users).get().then(
+          (value) =>
+              value.docs.map((snap) => UserModel.fromFirestore(snap)).toList());
+    } catch (e) {
+      print(e.toString());
+      return null;
     }
   }
 }
