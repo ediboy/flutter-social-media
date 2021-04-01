@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_social_media/models/post_model.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CreatePostHelper extends ChangeNotifier {
   List<PlatformFile> attachments = [];
@@ -8,6 +11,8 @@ class CreatePostHelper extends ChangeNotifier {
   List removedAttachments = [];
   BuildContext context;
   final TextEditingController postController = new TextEditingController();
+  File cameraImage;
+  final picker = ImagePicker();
 
   // populate attachments
   void setAttachment(FilePickerResult result) {
@@ -27,6 +32,12 @@ class CreatePostHelper extends ChangeNotifier {
     if (_limitReached) {
       showReachedLimit();
     }
+
+    notifyListeners();
+  }
+
+  void setCameraAttachment(PickedFile file) {
+    attachments = [PlatformFile(path: file.path)];
 
     notifyListeners();
   }

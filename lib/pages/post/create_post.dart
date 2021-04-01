@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_social_media/helpers/create_post_helper.dart';
 import 'package:flutter_social_media/models/user_model.dart';
 import 'package:flutter_social_media/services/post_service.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:image_picker/image_picker.dart';
 
 class CreatePost extends StatefulWidget {
   final UserModel user;
@@ -120,9 +124,13 @@ class __PostFormState extends State<_PostForm> {
                   child: Stack(
                     children: [
                       Center(
-                        child: Image.memory(
-                          _createPostHelper.attachments[index].bytes,
-                        ),
+                        child: kIsWeb
+                            ? Image.memory(
+                                _createPostHelper.attachments[index].bytes,
+                              )
+                            : Image.file(
+                                File(_createPostHelper.attachments[index].path),
+                              ),
                       ),
                       Positioned(
                         top: 0,
@@ -149,7 +157,12 @@ class __PostFormState extends State<_PostForm> {
   }
 }
 
-class _BottomNav extends StatelessWidget {
+class _BottomNav extends StatefulWidget {
+  @override
+  __BottomNavState createState() => __BottomNavState();
+}
+
+class __BottomNavState extends State<_BottomNav> {
   @override
   Widget build(BuildContext context) {
     CreatePostHelper _createPostHelper = context.watch<CreatePostHelper>();
@@ -175,13 +188,22 @@ class _BottomNav extends StatelessWidget {
               }
             },
           ),
-          IconButton(
-            icon: Icon(
-              Icons.camera_alt,
-              color: Theme.of(context).primaryColor,
+          if (!kIsWeb) ...[
+            IconButton(
+              icon: Icon(
+                Icons.camera_alt,
+                color: Theme.of(context).primaryColor,
+              ),
+              onPressed: () async {
+                final pickedFile = await _createPostHelper.picker
+                    .getImage(source: ImageSource.camera);
+
+                if (pickedFile != null) {
+                  _createPostHelper.setCameraAttachment(pickedFile);
+                }
+              },
             ),
-            onPressed: () {},
-          ),
+          ],
         ],
       ),
     );

@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_social_media/models/post_model.dart';
 import 'package:flutter_social_media/models/user_model.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class PostService {
   final String postId;
@@ -109,9 +112,17 @@ class PostService {
 
       for (var attachment in attachments) {
         // upload attachment to storage
-        TaskSnapshot _result = await _storage
-            .ref('posts/${postDocument.id}/${attachment.name}')
-            .putData(attachment.bytes);
+        TaskSnapshot _result;
+
+        if (kIsWeb) {
+          _result = await _storage
+              .ref('posts/${postDocument.id}/${attachment.name}')
+              .putData(attachment.bytes);
+        } else {
+          _result = await _storage
+              .ref('posts/${postDocument.id}/${attachment.name}')
+              .putFile(File(attachment.path));
+        }
 
         if (_result != null) {
           String _path =
