@@ -5,6 +5,10 @@ import 'package:flutter_social_media/models/post_model.dart';
 import 'package:flutter_social_media/models/user_model.dart';
 
 class PostService {
+  final String postId;
+
+  PostService({this.postId});
+
   // collection reference
   final CollectionReference _postCollection =
       FirebaseFirestore.instance.collection('posts');
@@ -177,5 +181,13 @@ class PostService {
       print(e.toString());
       return null;
     }
+  }
+
+  // stream post
+  Stream<PostModel> get post {
+    return _postCollection
+        .doc(postId)
+        .snapshots()
+        .map((snap) => PostModel.fromFirestore(snap));
   }
 }
