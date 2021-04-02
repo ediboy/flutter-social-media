@@ -1,16 +1,26 @@
-# flutter_social_media
+# Flutter Social Media App
 
-A new Flutter project.
+Basic social media app created in flutter.
 
-## Getting Started
+**Uses the following**
+- Flutter for mobile app development
+- Firebase Firestore for database
+- Firebase Auth for authentication
+- Firebase Storage for attachment storage
+- Provider package for state management
+- File Picker package for selecting attachment
+- Timeago package for coverting timestamp to readable time
+- Staggered Grid View package for displaying different size of grid layout
+- Auto Size Text package to handle long description text
+- Carousel Slider package for attachment preview
+- Image Picker package for camera attachment
 
-This project is a starting point for a Flutter application.
+[See it in action](https://ediboy-ilagan.web.app/#/social-media)
+[Download it in PlayStore](https://play.google.com/store/apps/details?id=com.ediboy.portfolio&ah=1yOiAUdr_PVR8aJVf97R7pQRVl0&fbclid=IwAR29QTPawqnrL2bLuLTDuN8oBouvODDC4MPzeEG8V5quyZHBmpZa9q4UyQo)
 
-A few resources to get you started if this is your first Flutter project:
+![social-media](https://user-images.githubusercontent.com/8133093/113396904-d1f56b00-93ce-11eb-99ca-7d2f6e5b6366.gif)
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+**To Dos**
+- Add reply to comment
+- Add emoji support
+- Add video attachment support
